@@ -4,12 +4,21 @@ package main.java.com.ifmomd.lesson2;
 import static android.graphics.Color.*;
 
 /**
- * ARGB_8888 bitmaps only
+ * Class for presentation image in memory. Includes some base algorithms.
+ * <p/>
+ * Contains width,height parameters and linear array with pixels in ARGB_8888 format.
  */
 public class Image {
     private int[] pixels;
     private int width, height;
 
+    /**
+     * Create new image
+     *
+     * @param pixels must be in ARGB_8888 fotmat
+     * @param width  image width
+     * @param height image height
+     */
     public Image(int[] pixels, int width, int height) {
         checkDimensions(width, height);
         checkPixels(pixels, width, height);
@@ -31,6 +40,13 @@ public class Image {
         }
     }
 
+    /**
+     * Scale current image to new dimensions by nearest neighbor algorithm
+     *
+     * @param newWidth  new width value
+     * @param newHeight new height value
+     * @return scaled image
+     */
     public Image fastScale(int newWidth, int newHeight) {
         checkDimensions(newWidth, newHeight);
 
@@ -50,6 +66,12 @@ public class Image {
         return new Image(newPixels, newWidth, newHeight);
     }
 
+    /**
+     * Increase image brightness to increaseFactor
+     *
+     * @param increaseFactor value that will be increased each color channel
+     * @return image with changed brightness
+     */
     public Image changeBrightness(int increaseFactor) {
         int[] newPixels = new int[width * height];
 
@@ -69,6 +91,12 @@ public class Image {
         return new Image(newPixels, width, height);
     }
 
+    /**
+     * Check channel value that it contains in 0..255 range
+     *
+     * @param value value to be checked
+     * @return value, if it contains in 0..255 range; 0 if value < 0; 255 if value > 0
+     */
     private int checkChannelValue(int value) {
         if (value < 0) {
             return 0;
@@ -81,6 +109,11 @@ public class Image {
         return value;
     }
 
+    /**
+     * Count brightness as arithmetical mean of all color channels in each pixel
+     *
+     * @return counted brightness value
+     */
     public int countBrightness() {
         int sum = 0;
 
@@ -95,6 +128,11 @@ public class Image {
         return sum / (3 * width * height);
     }
 
+    /**
+     * Rotate image on 90 degrees clockwise
+     *
+     * @return rotated image
+     */
     public Image rotateClockwise() {
         int newWidth = height;
         int newHeight = width;
@@ -109,6 +147,13 @@ public class Image {
         return new Image(newPixels, newWidth, newHeight);
     }
 
+    /**
+     * Scale current image to new dimensions by bilinear interpolation algorithm
+     *
+     * @param newWidth  new width value
+     * @param newHeight new height value
+     * @return scaled image
+     */
     public Image bilinearInterpolationScale(int newWidth, int newHeight) {
         int[] newPixels = new int[newWidth * newHeight];
 
