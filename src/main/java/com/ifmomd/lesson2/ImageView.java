@@ -37,7 +37,7 @@ public class ImageView extends View {
         image = image.changeBrightness(image.countBrightness());
 
         images[1] = image.fastScale(405, 434);
-        images[2] = image.bicubicInterpolationScale(405, 434);
+        images[2] = image.bilinearInterpolationScale(405, 434);
 
         setOnClickListener(new OnClickListener() {
             @Override

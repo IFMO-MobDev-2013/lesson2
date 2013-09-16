@@ -11,23 +11,28 @@ public class Image {
     private int width, height;
 
     public Image(int[] pixels, int width, int height) {
-        if (width <= 0 || height <= 0) {
-            throw new IllegalArgumentException("Incorrect dimensions");
-        }
-
-        if (pixels.length != width * height) {
-            throw new IllegalArgumentException("Incorrect pixels's size");
-        }
+        checkDimensions(width, height);
+        checkPixels(pixels, width, height);
 
         this.pixels = pixels;
         this.width = width;
         this.height = height;
     }
 
-    public Image fastScale(int newWidth, int newHeight) {
-        if (newWidth <= 0 || newHeight <= 0) {
+    private void checkDimensions(int width, int height) {
+        if (width <= 0 || height <= 0) {
             throw new IllegalArgumentException("Incorrect dimensions");
         }
+    }
+
+    private void checkPixels(int[] pixels, int width, int height) {
+        if (pixels.length != width * height) {
+            throw new IllegalArgumentException("Incorrect pixels's size");
+        }
+    }
+
+    public Image fastScale(int newWidth, int newHeight) {
+        checkDimensions(newWidth, newHeight);
 
         int[] newPixels = new int[newWidth * newHeight];
 
@@ -69,8 +74,8 @@ public class Image {
             return 0;
         }
 
-        if (value > 255) {
-            return 255;
+        if (value > 0xff) {
+            return 0xff;
         }
 
         return value;
@@ -104,8 +109,57 @@ public class Image {
         return new Image(newPixels, newWidth, newHeight);
     }
 
-    public Image bicubicInterpolationScale(int newWidth, int newHeight) {
-        return this;
+    public Image bilinearInterpolationScale(int newWidth, int newHeight) {
+        int[] newPixels = new int[newWidth * newHeight];
+
+        for (int y = 0; y < newHeight; y++) {
+            float tmp = (float) y / (newHeight - 1) * (height - 1);
+
+            int h = (int) Math.floor(tmp);
+            if (h < 0) {
+                h = 0;
+            } else {
+                if (h > height - 2) {
+                    h = height - 2;
+                }
+            }
+
+            float u = (tmp - h);
+
+            for (int x = 0; x < newWidth; x++) {
+                tmp = (float) x / (newWidth - 1) * (width - 1);
+
+                int w = (int) Math.floor(tmp);
+                if (w < 0) {
+                    w = 0;
+                } else {
+                    if (w > width - 2) {
+                        w = width - 2;
+                    }
+                }
+
+                float t = tmp - w;
+
+                float d1 = (1 - t) * (1 - u);
+                float d2 = t * (1 - u);
+                float d3 = t * u;
+                float d4 = (1 - t) * u;
+
+                int p1 = pixels[h * width + w];
+                int p2 = pixels[h * width + w + 1];
+                int p3 = pixels[(h + 1) * width + w + 1];
+                int p4 = pixels[(h + 1) * width + w + 1];
+
+                int alpha = (int) (alpha(p1) * d1 + alpha(p2) * d2 + alpha(p3) * d3 + alpha(p4) * d4);
+                int red = (int) (red(p1) * d1 + red(p2) * d2 + red(p3) * d3 + red(p4) * d4);
+                int green = (int) (green(p1) * d1 + green(p2) * d2 + green(p3) * d3 + green(p4) * d4);
+                int blue = (int) (blue(p1) * d1 + blue(p2) * d2 + blue(p3) * d3 + blue(p4) * d4);
+
+                newPixels[y * newWidth + x] = argb(alpha, red, green, blue);
+            }
+        }
+
+        return new Image(newPixels, newWidth, newHeight);
     }
 
     public int[] getPixels() {
