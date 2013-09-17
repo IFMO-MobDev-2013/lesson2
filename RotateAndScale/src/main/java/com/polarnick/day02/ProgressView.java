@@ -34,6 +34,11 @@ public class ProgressView extends View {
         invalidate();
     }
 
+    public void setShowPercenages(boolean showPercenages) {
+        this.showPercenages = showPercenages;
+        invalidate();
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         if (showPercenages) {

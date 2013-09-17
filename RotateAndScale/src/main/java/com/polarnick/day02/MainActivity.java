@@ -8,9 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
-import android.view.ViewGroup;
 import com.polarnick.polaris.concurrency.AsyncCallback;
-import com.polarnick.polaris.concurrency.AsyncProgressCallback;
 import com.polarnick.polaris.utils.ImageRotateProcessor;
 import com.polarnick.polaris.utils.ImageScaleProcessor;
 
@@ -27,11 +25,11 @@ public class MainActivity extends Activity {
     private final ImageScaleProcessor imageScaleProcessor = new ImageScaleProcessor(THREADS_COUNT);
 
     private ImageView imageView;
-    private ProgressView progressView;
 
     private int screenWidth;
     private int screenHeight;
     private Bitmap sourceImage;
+    private Bitmap rotatedSourceImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +37,8 @@ public class MainActivity extends Activity {
         initScreenSize();
         initSourceImage();
         imageView = new ImageView(this, sourceImage, screenWidth, screenHeight);
-        progressView = new ProgressView(this, screenWidth, screenHeight);
         setContentView(imageView);
-        addContentView(progressView, new ViewGroup.LayoutParams(screenWidth, screenHeight));
+        initRotatedSourceImage();
     }
 
     private void initScreenSize() {
@@ -56,21 +53,30 @@ public class MainActivity extends Activity {
         sourceImage = BitmapFactory.decodeResource(getResources(), R.drawable.source_image);
     }
 
+    private void initRotatedSourceImage() {
+        imageRotateProcessor.rotateBy90(sourceImage, new AsyncCallback<Bitmap>() {
+            @Override
+            public void onSuccess(Bitmap bitmap) {
+                rotatedSourceImage = bitmap;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        imageView.updateImage(rotatedSourceImage);
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Throwable reason) {
+                Log.e(this.getClass().getName(), "Image rotating failed!", reason);
+            }
+        });
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            imageScaleProcessor.scale(sourceImage, 0.5,
-                    new AsyncProgressCallback() {
-                        @Override
-                        public void progressPassed(double progressDelta, final double fullProgress) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    progressView.updatePercetage((int) (fullProgress * 100));
-                                }
-                            });
-                        }
-                    },
+            imageScaleProcessor.scale(rotatedSourceImage, 0.5, null,
                     new AsyncCallback<Bitmap>() {
                         @Override
                         public void onSuccess(final Bitmap bitmap) {

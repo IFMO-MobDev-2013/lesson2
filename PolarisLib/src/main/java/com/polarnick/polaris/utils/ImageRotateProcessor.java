@@ -15,16 +15,16 @@ import java.util.concurrent.Executors;
  */
 public class ImageRotateProcessor {
 
-    private final int threadsCount;
+    private final int optimalThreadsCount;
     private final ExecutorService threadsPool;
 
     /**
-     * @param threadsCount count of threads to be used over all time(if two or more methods will be executed
-     *                     simultaneously - they will share given threads, but not <b>threadsCount<b/> threads per method)
+     * @param optimalThreadsCount count of threads to be used over all time(if two or more methods will be executed
+     *                            simultaneously - they will share given threads, but not <b>optimalThreadsCount<b/> threads per method)
      */
-    public ImageRotateProcessor(int threadsCount) {
-        this.threadsCount = threadsCount;
-        this.threadsPool = Executors.newFixedThreadPool(threadsCount);
+    public ImageRotateProcessor(int optimalThreadsCount) {
+        this.optimalThreadsCount = optimalThreadsCount;
+        this.threadsPool = Executors.newFixedThreadPool(optimalThreadsCount + 1);
     }
 
     /**
@@ -45,27 +45,38 @@ public class ImageRotateProcessor {
      *                       (Can be <b>null</b>)
      * @param callback       to provide result
      */
-    public void rotateBy90(Bitmap image, AsyncProgressCallback progressHolder, AsyncCallback<Bitmap> callback) {
-        Bitmap result = Bitmap.createBitmap(image.getHeight(), image.getWidth(), Bitmap.Config.RGB_565);
-        CountDownLatch finish = new CountDownLatch(threadsCount);
-        for (int i = 0; i < threadsCount; i++) {
-            threadsPool.execute(
-                    new ImageRotatorBy90(image, result, image.getHeight() * i / threadsCount, image.getHeight() * (i + 1) / threadsCount)
-                            .setReportProgress(1.0 / threadsCount, progressHolder)
-                            .setNotifyWhenFinish(finish));
-        }
-        try {
-            finish.await();
-            callback.onSuccess(result);
-        } catch (InterruptedException e) {
-            callback.onFailure(e);
-        }
+    public void rotateBy90(final Bitmap image, final AsyncProgressCallback progressHolder, final AsyncCallback<Bitmap> callback) {
+        threadsPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                byte[] sourceBytes = BitmapUtils.convertToByteArray(image);
+                byte[] targetBytes = new byte[sourceBytes.length];
+                CountDownLatch finish = new CountDownLatch(optimalThreadsCount);
+                for (int i = 0; i < optimalThreadsCount; i++) {
+                    final int fromY = image.getWidth() * i / optimalThreadsCount;
+                    final int toY = image.getWidth() * (i + 1) / optimalThreadsCount;
+                    threadsPool.execute(
+                            new ImageRotatorBy90(sourceBytes, image.getWidth(), image.getHeight(),
+                                    targetBytes, fromY, toY)
+                                    .setReportProgress(1.0 / optimalThreadsCount, progressHolder)
+                                    .setNotifyWhenFinish(finish));
+                }
+                try {
+                    finish.await();
+                    callback.onSuccess(BitmapUtils.createBitmapFromBytes(targetBytes, image.getHeight(), image.getWidth()));
+                } catch (InterruptedException e) {
+                    callback.onFailure(e);
+                }
+            }
+        });
     }
 
     private static class ImageRotatorBy90 implements Runnable {
 
-        private final Bitmap source;
-        private final Bitmap target;
+        private final byte[] source;
+        private final byte[] target;
+        private final int sourceWidth;
+        private final int sourceHeigth;
         private final int fromY;
         private final int toY;
 
@@ -74,8 +85,10 @@ public class ImageRotateProcessor {
 
         private CountDownLatch notifyAtFinish = null;
 
-        public ImageRotatorBy90(Bitmap source, Bitmap target, int fromY, int toY) {
+        public ImageRotatorBy90(byte[] source, int sourceWidth, int sourceHeight, byte[] target, int fromY, int toY) {
             this.source = source;
+            this.sourceWidth = sourceWidth;
+            this.sourceHeigth = sourceHeight;
             this.target = target;
             this.fromY = fromY;
             this.toY = toY;
@@ -99,8 +112,10 @@ public class ImageRotateProcessor {
         @Override
         public void run() {
             for (int y = fromY; y < toY; y++) {
-                for (int x = 0; x < source.getWidth(); x++) {
-                    target.setPixel(y, x, source.getPixel(x, y));
+                for (int x = 0; x < sourceHeigth; x++) {
+                    System.arraycopy(source, 4 * ((sourceHeigth - x - 1) * sourceWidth + y),
+                            target, 4 * (y * sourceHeigth + x),
+                            4);
                 }
                 if (progressHolder != null) {
                     progressHolder.registerProgressPassed(fullProgress * (y + 1) / (toY - fromY));
