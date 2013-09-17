@@ -207,14 +207,29 @@ public class Image {
         return new Image(newPixels, newWidth, newHeight);
     }
 
+    /**
+     * Get array of pixels
+     *
+     * @return array of pixels
+     */
     public int[] getPixels() {
         return pixels;
     }
 
+    /**
+     * Get image width
+     *
+     * @return image width
+     */
     public int getWidth() {
         return width;
     }
 
+    /**
+     * Get image Height
+     *
+     * @return image height
+     */
     public int getHeight() {
         return height;
     }
