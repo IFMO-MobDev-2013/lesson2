@@ -62,14 +62,24 @@ public class MainActivity extends Activity {
             imageScaleProcessor.scale(sourceImage, 0.5,
                     new AsyncProgressCallback() {
                         @Override
-                        public void progressPassed(double progressDelta, double fullProgress) {
-                            progressView.updatePercetage((int) (fullProgress * 100));
+                        public void progressPassed(double progressDelta, final double fullProgress) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    progressView.updatePercetage((int) (fullProgress * 100));
+                                }
+                            });
                         }
                     },
                     new AsyncCallback<Bitmap>() {
                         @Override
-                        public void onSuccess(Bitmap bitmap) {
-                            imageView.updateImage(bitmap);
+                        public void onSuccess(final Bitmap bitmap) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    imageView.updateImage(bitmap);
+                                }
+                            });
                         }
 
                         @Override
