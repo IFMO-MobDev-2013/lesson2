@@ -8,7 +8,10 @@
             android:minSdkVersion="8"
             android:targetSdkVersion="16"/>
 
-    <application>
+    <application
+            android:icon="@drawable/cat_icon"
+            android:label="Rotate and Scale"
+            android:theme="@android:style/Theme.NoTitleBar">
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

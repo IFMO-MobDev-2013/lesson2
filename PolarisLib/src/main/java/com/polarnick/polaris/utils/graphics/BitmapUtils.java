@@ -1,6 +1,7 @@
-package com.polarnick.polaris.utils;
+package com.polarnick.polaris.utils.graphics;
 
 import android.graphics.Bitmap;
+import com.google.common.base.Preconditions;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -20,6 +21,7 @@ public class BitmapUtils {
     }
 
     public static Bitmap createBitmapFromBytes(byte[] buffer, int width, int height) {
+        Preconditions.checkArgument(buffer.length == 4 * width * height, "Buffer contains bigger image, than given size!");
         Bitmap res = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         res.copyPixelsFromBuffer(ByteBuffer.wrap(buffer));
         return res;

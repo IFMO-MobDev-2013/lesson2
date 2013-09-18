@@ -9,8 +9,10 @@ import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import com.polarnick.polaris.concurrency.AsyncCallback;
-import com.polarnick.polaris.utils.ImageRotateProcessor;
-import com.polarnick.polaris.utils.ImageScaleProcessor;
+import com.polarnick.polaris.utils.graphics.ImageAsyncProcessingChain;
+import com.polarnick.polaris.utils.graphics.ImageFastScaler;
+import com.polarnick.polaris.utils.graphics.ImageProcessingBase;
+import com.polarnick.polaris.utils.graphics.ImageRotator;
 
 /**
  * Date: 16.09.13
@@ -20,16 +22,19 @@ import com.polarnick.polaris.utils.ImageScaleProcessor;
 public class MainActivity extends Activity {
 
     private static final int THREADS_COUNT = Runtime.getRuntime().availableProcessors() + 1;
+    private static final double SCALE_FACTOR = 1 / 1.73;
 
-    private final ImageRotateProcessor imageRotateProcessor = new ImageRotateProcessor(THREADS_COUNT);
-    private final ImageScaleProcessor imageScaleProcessor = new ImageScaleProcessor(THREADS_COUNT);
+    private final ImageProcessingBase imageRotator = new ImageRotator();
+    private final ImageProcessingBase imageScaler = new ImageFastScaler(SCALE_FACTOR);
 
     private ImageView imageView;
 
     private int screenWidth;
     private int screenHeight;
+
     private Bitmap sourceImage;
-    private Bitmap rotatedSourceImage;
+
+    private boolean calculating;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +43,6 @@ public class MainActivity extends Activity {
         initSourceImage();
         imageView = new ImageView(this, sourceImage, screenWidth, screenHeight);
         setContentView(imageView);
-        initRotatedSourceImage();
     }
 
     private void initScreenSize() {
@@ -50,50 +54,33 @@ public class MainActivity extends Activity {
     }
 
     private void initSourceImage() {
-        sourceImage = BitmapFactory.decodeResource(getResources(), R.drawable.source_image);
-    }
-
-    private void initRotatedSourceImage() {
-        imageRotateProcessor.rotateBy90(sourceImage, new AsyncCallback<Bitmap>() {
-            @Override
-            public void onSuccess(Bitmap bitmap) {
-                rotatedSourceImage = bitmap;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        imageView.updateImage(rotatedSourceImage);
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(Throwable reason) {
-                Log.e(this.getClass().getName(), "Image rotating failed!", reason);
-            }
-        });
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false;
+        sourceImage = BitmapFactory.decodeResource(getResources(), R.drawable.source_image, options);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            imageScaleProcessor.scale(rotatedSourceImage, 0.5, null,
-                    new AsyncCallback<Bitmap>() {
+        if (event.getAction() == MotionEvent.ACTION_DOWN && !calculating) {
+            calculating = true;
+            new ImageAsyncProcessingChain(sourceImage, THREADS_COUNT).process(imageRotator).process(imageScaler)
+                    .asyncExecute(new AsyncCallback<Bitmap>() {
                         @Override
-                        public void onSuccess(final Bitmap bitmap) {
+                        public void onSuccess(final Bitmap resultImage) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    imageView.updateImage(bitmap);
+                                    imageView.updateImage(resultImage);
+                                    calculating = false;
                                 }
                             });
                         }
 
                         @Override
                         public void onFailure(Throwable reason) {
-                            Log.e(this.getClass().getName(), "Image scaling failed!", reason);
+                            Log.e(this.getClass().getName(), "Image processing failed!", reason);
                         }
-                    }
-            );
+                    });
             return true;
         } else {
             return false;

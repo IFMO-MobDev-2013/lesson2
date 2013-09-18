@@ -7,6 +7,9 @@ import android.graphics.Paint;
 import android.view.View;
 
 /**
+ * This view draw progress percentages at the screen center. For example: "45%" or "100%". But for example "239%" can't
+ * be shown by it, even though the significance of this number.
+ * <p/>
  * Date: 17.09.13
  *
  * @author Nickolay Polyarniy aka PolarNick
@@ -20,6 +23,9 @@ public class ProgressView extends View {
     private volatile boolean showPercenages = false;
     private volatile int progressPercentages;
 
+    private volatile int lastRenderedPercentages;
+    private volatile boolean rendering = false;
+
     public ProgressView(Context context, int screenWidth, int screenHeight) {
         super(context);
         this.screenWidth = screenWidth;
@@ -31,18 +37,30 @@ public class ProgressView extends View {
 
     public void updatePercetage(int progress) {
         progressPercentages = progress;
-        invalidate();
+        if (!rendering && progressPercentages > lastRenderedPercentages) {
+            lastRenderedPercentages = progressPercentages;
+            rendering = true;
+            invalidate();
+        }
     }
 
     public void setShowPercenages(boolean showPercenages) {
         this.showPercenages = showPercenages;
-        invalidate();
+        if (!rendering) {
+            rendering = true;
+            invalidate();
+        }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
+        rendering = false;
         if (showPercenages) {
-            canvas.drawText(progressPercentages + "%", screenWidth / 2, screenHeight / 2, percenagesPaint);
+            if (progressPercentages == 239) {
+                canvas.drawText("Honor the contract!!!", screenWidth / 2, screenHeight / 2, percenagesPaint);
+            } else {
+                canvas.drawText(progressPercentages + "%", screenWidth / 2, screenHeight / 2, percenagesPaint);
+            }
         }
     }
 }

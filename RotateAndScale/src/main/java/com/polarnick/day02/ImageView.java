@@ -6,6 +6,8 @@ import android.graphics.Canvas;
 import android.view.View;
 
 /**
+ * This view draw given image at the screen center.
+ * <p/>
  * Date: 16.09.13
  *
  * @author Nickolay Polyarniy aka PolarNick
