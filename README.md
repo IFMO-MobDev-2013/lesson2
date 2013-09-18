@@ -1,6 +1,7 @@
 GImageResizer
 ==================
 Автор: Георгий Агапов (группа 2537)
+
 APK: http://yadi.sk/d/kQjHe4bF9TPQY
 
 
