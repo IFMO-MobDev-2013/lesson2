@@ -9,7 +9,7 @@
         android:targetSdkVersion="16" />
 
     <application android:icon="@drawable/ic_launcher">
-        <activity android:name="ru.zulyaev.ifmo.android.lesson2.MainActivity">
+        <activity android:name=".MainActivity" android:label="@string/app">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

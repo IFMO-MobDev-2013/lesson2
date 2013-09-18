@@ -7,11 +7,11 @@ public final class ColorUtils {
     private ColorUtils() {
     }
 
-    public static float[] toHSLA(int color, float[] buffer) {
-        float a = (color >> 24 & 0xFF) / 255f;
-        float r = (color >> 16 & 0xFF) / 255f;
-        float g = (color >> 8 & 0xFF) / 255f;
-        float b = (color & 0xFF) / 255f;
+    public static float[] toHSLA(int red, int green, int blue, int alpha, float[] buffer) {
+        float a = alpha / 255f;
+        float r = red / 255f;
+        float g = green / 255f;
+        float b = blue / 255f;
 
         float max = MathUtils.max(r, g, b);
         float min = MathUtils.min(r, g, b);
@@ -42,9 +42,13 @@ public final class ColorUtils {
         return buffer;
     }
 
-    public static int lighten(float[] hsla, float lightness) {
+    public static float[] toHSLA(int color, float[] buffer) {
+        return toHSLA(color >> 16 & 0xFF, color >> 8 & 0xFF, color & 0xFF, color >> 24 & 0xFF, buffer);
+    }
+
+    public static float[] lighten(float[] hsla, float lightness) {
         hsla[2] = MathUtils.bound(hsla[2] + lightness, 0, 1);
-        return hsla(hsla);
+        return hsla;
     }
 
     private static float hue(float h, float m1, float m2) {

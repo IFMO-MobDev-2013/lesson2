@@ -15,7 +15,7 @@ public class ImageLighteningView implements Image {
     private static final float[] BUFFER = new float[4];
 
     private static int makeBrighter(int color) {
-        return ColorUtils.lighten(ColorUtils.toHSLA(color, BUFFER), 0.05f);
+        return ColorUtils.hsla(ColorUtils.lighten(ColorUtils.toHSLA(color, BUFFER), 0.1f));
     }
 
     @Override

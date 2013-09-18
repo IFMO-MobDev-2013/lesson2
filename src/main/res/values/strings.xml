@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app">Image Process</string>
+    <string name="next">Next!</string>
+    <integer name="width">405</integer>
+    <integer name="height">434</integer>
+</resources>
