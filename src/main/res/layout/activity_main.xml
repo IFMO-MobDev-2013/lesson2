@@ -11,6 +11,19 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        android:text="@string/hello_world"
+        android:id="@+id/textView1"
+        android:layout_toRightOf="@+id/imageContainer"
+        android:layout_below="@+id/imageContainer"/>
+
+    <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageContainer"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="78dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="95dp"
+            android:clickable="true"/>
 
 </RelativeLayout>
