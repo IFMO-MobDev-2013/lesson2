@@ -62,7 +62,7 @@ public class MyActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
-        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.cat);
+        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.source);
         for (int i = 0; i < 700; i++)
             for (int j = 0; j < 750; j++)
                 bit[750 - j][i] = bitmap.getPixel(i, j);
