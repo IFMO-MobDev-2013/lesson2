@@ -10,7 +10,6 @@ public enum ImageProcessor {
     GOOD {
         @Override
         public int[] proccess(int[] colors, int srcWidth, int srcHeight, int destWidth, int destHeight) {
-            final float[] hslaBuffer = new float[4];
             final int[] result = new int[destWidth * destHeight];
 
             final int tempWidth = MathUtils.lcm(srcWidth, destWidth);
@@ -51,17 +50,12 @@ public enum ImageProcessor {
                         }
                     }
 
-                    result[j * destHeight + destHeight - i - 1] = ColorUtils.hsla(
-                            ColorUtils.lighten(
-                                    ColorUtils.toHSLA(
-                                            sr / downscaleRate,
-                                            sg / downscaleRate,
-                                            sb / downscaleRate,
-                                            sa / downscaleRate,
-                                            hslaBuffer
-                                    ),
-                                    0.1f
-                            )
+                    result[j * destHeight + destHeight - i - 1] = ColorUtils.brighter(
+                            sr / downscaleRate,
+                            sg / downscaleRate,
+                            sb / downscaleRate,
+                            sa / downscaleRate,
+                            1.5f
                     );
                 }
             }
@@ -72,17 +66,12 @@ public enum ImageProcessor {
         @Override
         public int[] proccess(int[] colors, int srcWidth, int srcHeight, int destWidth, int destHeight) {
             final int[] result = new int[destWidth * destHeight];
-            final float[] hslaBuffer = new float[4];
 
             for (int i = 0; i < destHeight; ++i) {
                 for (int j = 0; j < destWidth; ++j) {
-                    result[j * destHeight + destHeight - i - 1] = ColorUtils.hsla(
-                            ColorUtils.lighten(
-                                    ColorUtils.toHSLA(
-                                            colors[i * srcHeight / destHeight * srcWidth + j * srcWidth / destWidth], hslaBuffer
-                                    ),
-                                    0.1f
-                            )
+                    result[j * destHeight + destHeight - i - 1] = ColorUtils.brighter(
+                            colors[i * srcHeight / destHeight * srcWidth + j * srcWidth / destWidth],
+                            1.5f
                     );
                 }
             }

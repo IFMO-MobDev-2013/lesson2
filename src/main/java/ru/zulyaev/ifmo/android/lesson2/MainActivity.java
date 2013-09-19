@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 
 import java.util.Iterator;
@@ -16,7 +15,7 @@ import java.util.Iterator;
  */
 public class MainActivity extends Activity implements View.OnClickListener {
     private ImageView view;
-    private Button button;
+//    private Button button;
 
     private Bitmap bitmap;
     private int sourceWidth;
@@ -31,7 +30,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.main);
 
         view = (ImageView) findViewById(R.id.imageView);
-        button = (Button) findViewById(R.id.button);
+//        button = (Button) findViewById(R.id.button);
 
         Bitmap sourceBitmap = BitmapFactory.decodeResource(getResources(), R.raw.source);
         sourceWidth = sourceBitmap.getWidth();
@@ -57,7 +56,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     class RenderTask extends AsyncTask<Void, Void, Bitmap> {
         @Override
         protected void onPreExecute() {
-            button.setEnabled(false);
+//            button.setEnabled(false);
         }
 
         @Override
@@ -73,7 +72,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             view.setImageBitmap(bitmap);
-            button.setEnabled(true);
+//            button.setEnabled(true);
         }
     }
 }

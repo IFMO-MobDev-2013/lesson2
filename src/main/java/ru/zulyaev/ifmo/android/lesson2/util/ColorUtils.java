@@ -78,4 +78,26 @@ public final class ColorUtils {
     public static int rgba(int r, int g, int b, int a) {
         return a << 24 | r << 16 | g << 8 | b;
     }
+
+    public static int expBrighter(int r, int g, int b, int a, float exp) {
+        float brightness = MathUtils.max(r, g, b) / 255f;
+        float q = (float)Math.pow(brightness, exp) / brightness;
+        r = (int)(r * q);
+        g = (int)(g * q);
+        b = (int)(b * q);
+        return rgba(r, g, b, a);
+    }
+
+    public static int brighter(int r, int g, int b, int a, float factor) {
+        float maxQ = 255f / MathUtils.max(r, g, b);
+        float q = maxQ < factor ? maxQ : factor;
+        r = (int)(r * q);
+        g = (int)(g * q);
+        b = (int)(b * q);
+        return rgba(r, g, b, a);
+    }
+
+    public static int brighter(int color, float brightness) {
+        return brighter(color >> 16 & 0xFF, color >> 8 & 0xFF, color & 0xFF, color >> 24 & 0xFF, brightness);
+    }
 }
