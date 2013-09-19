@@ -2,6 +2,8 @@ package com.polarnick.polaris.utils.graphics;
 
 import android.graphics.Bitmap;
 
+import java.util.Arrays;
+
 /**
  * Date: 18.09.13
  *
@@ -51,6 +53,8 @@ public class ImageQualityScaler extends ImageProcessingBase {
             }
         }
 
+        private final int[] sumComponents = new int[4];
+
         private void updateColor(int targetX, int targetY) {
             int leftX = sourceWidth * SOURCE_MULTIPLIER * targetX / targetWidth;
             int topY = sourceHeigth * SOURCE_MULTIPLIER * targetY / targetHeight;
@@ -58,7 +62,7 @@ public class ImageQualityScaler extends ImageProcessingBase {
             int bottomY = sourceHeigth * SOURCE_MULTIPLIER * (targetY + 1) / targetHeight;
 
             int countOfUsedPixels = 0;
-            int[] sumComponents = new int[4];
+            Arrays.fill(sumComponents, 0);
             for (int y = topY; y < bottomY; y++) {
                 for (int x = leftX; x < rightX; x++) {
                     int sourceIndex = y / SOURCE_MULTIPLIER * sourceWidth + x / SOURCE_MULTIPLIER;
