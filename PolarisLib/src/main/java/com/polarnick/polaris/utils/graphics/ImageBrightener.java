@@ -13,11 +13,11 @@ public class ImageBrightener extends ImageProcessingBase {
     private double lighteningFactor;
 
     /**
-     * @param lighteningFactor must be in range <b>[0.0, 1.0]</b>
+     * @param lighteningFactor must be in range <b>[1.0, +infinity)</b>
      */
     public ImageBrightener(double lighteningFactor) {
         super();
-        Preconditions.checkArgument(0 <= lighteningFactor && lighteningFactor <= 1.0);
+        Preconditions.checkArgument(lighteningFactor >= 1.0);
         this.lighteningFactor = lighteningFactor;
     }
 
@@ -66,7 +66,7 @@ public class ImageBrightener extends ImageProcessingBase {
                 if (oldComponent < 0) {
                     oldComponent += 256;
                 }
-                target[4 * index + i] = (byte) (oldComponent + (255 - oldComponent) * lighteningFactor);
+                target[4 * index + i] = (byte) Math.min(oldComponent * lighteningFactor, 255);
             }
             target[4 * index + 3] = source[4 * index + 3];
         }

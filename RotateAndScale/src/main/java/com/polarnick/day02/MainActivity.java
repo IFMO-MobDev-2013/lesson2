@@ -23,7 +23,7 @@ public class MainActivity extends Activity {
 
     private static final int THREADS_COUNT = Runtime.getRuntime().availableProcessors() + 1;
     private static final double SCALE_FACTOR = 1 / 1.73;
-    private static final double LIGHTENING_FACTOR = 0.239;
+    private static final double LIGHTENING_FACTOR = 0.007 * 239;
 
     private final ImageProcessingBase imageRotator = new ImageRotator();
     private final List<ImageProcessingBase> imageScalers =
