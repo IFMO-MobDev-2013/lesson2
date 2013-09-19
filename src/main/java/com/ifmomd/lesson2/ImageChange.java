@@ -2,6 +2,7 @@ package main.java.com.ifmomd.lesson2;
 
 
 import android.preference.PreferenceActivity;
+import android.util.Log;
 
 /**
  * Created with IntelliJ IDEA.
@@ -45,6 +46,8 @@ public class ImageChange {
                 y = ((i * y_ratio) >> 16);
                 temp[(i * newWidth) + j] = imagePixels[(y * width) + x];
             }
+
+//        Log.d("debug", "\n fast scale "+ newWidth + " " + newHeight);
         return new ImageChange(temp, newWidth, newHeight);
     }
 
@@ -89,6 +92,7 @@ public class ImageChange {
                                 ((int) blue);
             }
         }
+//        Log.d("dgdgdg", "\n good scale "+ newWidth + " " + newHeight);
         return new ImageChange(temp, newWidth, newHeight);
     }
 

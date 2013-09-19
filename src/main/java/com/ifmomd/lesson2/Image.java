@@ -54,7 +54,7 @@ public class Image extends View {
         imageChange = imageChange.increaseBrightness();
 
         fastScaleTime = SystemClock.uptimeMillis();        // count the time of fast scale
-        fastScaleImage = imageChange.fastScale(NEW_WIDTH, NEW_WIDTH);
+        fastScaleImage = imageChange.fastScale(NEW_WIDTH, NEW_HEIGHT);
         fastScaleTime = SystemClock.uptimeMillis() - fastScaleTime;
 
         qualityScaleTime = SystemClock.uptimeMillis();     //count the time of quality scale
