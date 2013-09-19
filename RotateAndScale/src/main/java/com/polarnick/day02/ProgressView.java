@@ -40,7 +40,7 @@ public class ProgressView extends View {
         if (!rendering && progressPercentages > lastRenderedPercentages) {
             lastRenderedPercentages = progressPercentages;
             rendering = true;
-            invalidate();
+            postInvalidate();
         }
     }
 
@@ -48,7 +48,7 @@ public class ProgressView extends View {
         this.showPercenages = showPercenages;
         if (!rendering) {
             rendering = true;
-            invalidate();
+            postInvalidate();
         }
     }
 

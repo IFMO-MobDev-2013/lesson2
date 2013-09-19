@@ -8,11 +8,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
+import com.google.common.collect.Lists;
 import com.polarnick.polaris.concurrency.AsyncCallback;
-import com.polarnick.polaris.utils.graphics.ImageAsyncProcessingChain;
-import com.polarnick.polaris.utils.graphics.ImageFastScaler;
-import com.polarnick.polaris.utils.graphics.ImageProcessingBase;
-import com.polarnick.polaris.utils.graphics.ImageRotator;
+import com.polarnick.polaris.utils.graphics.*;
+
+import java.util.List;
 
 /**
  * Date: 16.09.13
@@ -23,9 +23,13 @@ public class MainActivity extends Activity {
 
     private static final int THREADS_COUNT = Runtime.getRuntime().availableProcessors() + 1;
     private static final double SCALE_FACTOR = 1 / 1.73;
+    private static final double LIGHTENING_FACTOR = 0.239;
 
     private final ImageProcessingBase imageRotator = new ImageRotator();
-    private final ImageProcessingBase imageScaler = new ImageFastScaler(SCALE_FACTOR);
+    private final List<ImageProcessingBase> imageScalers =
+            Lists.newArrayList(new ImageFastScaler(SCALE_FACTOR), new ImageQualityScaler(SCALE_FACTOR));
+    private final ImageBrightener imageBrightener = new ImageBrightener(LIGHTENING_FACTOR);
+    private int nextImageScalerToBeUsed = 0;
 
     private ImageView imageView;
 
@@ -34,7 +38,7 @@ public class MainActivity extends Activity {
 
     private Bitmap sourceImage;
 
-    private boolean calculating;
+    private volatile boolean calculating;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,17 +67,16 @@ public class MainActivity extends Activity {
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN && !calculating) {
             calculating = true;
-            new ImageAsyncProcessingChain(sourceImage, THREADS_COUNT).process(imageRotator).process(imageScaler)
+            new ImageAsyncProcessingChain(sourceImage, THREADS_COUNT)
+                    .process(imageRotator)
+                    .process(imageScalers.get(nextImageScalerToBeUsed))
+                    .process(imageBrightener)
                     .asyncExecute(new AsyncCallback<Bitmap>() {
                         @Override
                         public void onSuccess(final Bitmap resultImage) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    imageView.updateImage(resultImage);
-                                    calculating = false;
-                                }
-                            });
+                            imageView.updateImage(resultImage);
+                            nextImageScalerToBeUsed = (nextImageScalerToBeUsed + 1) % imageScalers.size();
+                            calculating = false;
                         }
 
                         @Override

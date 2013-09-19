@@ -27,7 +27,7 @@ public class ImageView extends View {
 
     public void updateImage(Bitmap image) {
         this.image = image;
-        invalidate();
+        postInvalidate();
     }
 
     @Override

@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 public abstract class ImageProcessingBase {
 
     private int optimalThreadsCount = 1;
-    private ExecutorService threadsPool = Executors.newFixedThreadPool(optimalThreadsCount);
+    private ExecutorService threadsPool = Executors.newFixedThreadPool(optimalThreadsCount + 1);
 
     /**
      * @param optimalThreadsCount recommended count of threads to be used over all time(if two or more methods will be executed
@@ -39,7 +39,7 @@ public abstract class ImageProcessingBase {
             public void run() {
                 final int targetWidth = getTargetWidth(image);
                 final int targetHeight = getTargetHeight(image);
-                byte[] sourceBytes = BitmapUtils.convertToByteArray(image);
+                byte[] sourceBytes = ImageBitmapUtils.convertToByteArray(image);
                 byte[] targetBytes = new byte[4 * targetHeight * targetWidth];
                 CountDownLatch finish = new CountDownLatch(optimalThreadsCount);
                 for (int i = 0; i < optimalThreadsCount; i++) {
@@ -54,7 +54,7 @@ public abstract class ImageProcessingBase {
                 }
                 try {
                     finish.await();
-                    callback.onSuccess(BitmapUtils.createBitmapFromBytes(targetBytes, targetWidth, targetHeight));
+                    callback.onSuccess(ImageBitmapUtils.createBitmapFromBytes(targetBytes, targetWidth, targetHeight));
                 } catch (InterruptedException e) {
                     callback.onFailure(e);
                 }
@@ -62,9 +62,13 @@ public abstract class ImageProcessingBase {
         });
     }
 
-    protected abstract int getTargetWidth(Bitmap sourceImage);
+    protected int getTargetWidth(Bitmap sourceImage) {
+        return sourceImage.getWidth();
+    }
 
-    protected abstract int getTargetHeight(Bitmap sourceImage);
+    protected int getTargetHeight(Bitmap sourceImage) {
+        return sourceImage.getHeight();
+    }
 
     protected abstract ImageProcessor getProcessor(byte[] source, int sourceWidth, int sourceHeight,
                                                    byte[] target, int targetWidth, int targetHeight,
