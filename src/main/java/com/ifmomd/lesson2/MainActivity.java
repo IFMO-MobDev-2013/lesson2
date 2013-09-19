@@ -71,9 +71,8 @@ public class MainActivity extends Activity {
             }
             for (int i = 0; i < NEW_HEIGHT; ++i) {
                 for (int j = 0; j < NEW_WIDTH; ++j) {
-                    if (cnt[i * NEW_WIDTH + j] != 0)
                         for (int k = 0; k < 4; ++k)
-                            tmp[i * NEW_WIDTH + j][k] /= cnt[i * NEW_WIDTH + j];
+                            tmp[i * NEW_WIDTH + j][k] /= Math.max(cnt[i * NEW_WIDTH + j], 1);
                     compressedBitmap[i * NEW_WIDTH + j] = Color.argb(tmp[i * NEW_WIDTH + j][3], tmp[i * NEW_WIDTH + j][2],
                             tmp[i * NEW_WIDTH + j][1], tmp[i * NEW_WIDTH + j][0]);
                 }
@@ -103,12 +102,19 @@ public class MainActivity extends Activity {
         public void onDraw(Canvas canvas) {
             if (good_quality) {
                 fastCompression();
+                paint.setColor(Color.BLACK);
+                paint.setTextSize(20);
+                canvas.drawText("GOOD QUALITY", 20, 500, paint);
             } else {
                 goodQualityComression();
+                paint.setColor(Color.BLACK);
+                paint.setTextSize(20);
+                canvas.drawText("BAD QUALITY", 20, 500, paint);
             }
             makeBrighter();
             turn_right();
             canvas.drawBitmap(compressedBitmap, 0, NEW_HEIGHT, 0, 0, NEW_HEIGHT, NEW_WIDTH, true, paint);
+
 
         }
 
