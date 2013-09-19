@@ -1,3 +1,7 @@
+Ссылка на приложение:
+=======
+![alt tag](https://raw.github.com/GDR/lesson2/master/qr-code.gif)
+
 Материалы второй лекции:
 =======
 http://yadi.sk/d/AERRqQ-v9Gx77
