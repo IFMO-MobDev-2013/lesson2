@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.MotionEvent;
+import android.view.Window;
 
 public class MyActivity extends Activity
 {
@@ -13,7 +14,7 @@ public class MyActivity extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         OPTIONS = new BitmapFactory.Options();
         OPTIONS.inScaled = false;
         OPTIONS.inPreferredConfig = Bitmap.Config.RGB_565;
