@@ -24,6 +24,7 @@ public class MainActivity extends Activity {
         public static final int NEW_WIDTH = 405;
         public static final int NEW_HEIGHT = 434;
         Paint paint;
+        int[] originalPicBitMap;
 
         public MainView(Context context) {
             super(context);
@@ -31,6 +32,9 @@ public class MainActivity extends Activity {
             originalPic = BitmapFactory.decodeResource(getResources(), R.drawable.source);
             paint = new Paint();
             compressedBitmap = new int[NEW_WIDTH * NEW_HEIGHT];
+            originalPicBitMap = new int[OLD_HEIGHT * OLD_WIDTH];
+            makeBrighter();
+
         }
 
         public void fastCompression() {
@@ -38,8 +42,7 @@ public class MainActivity extends Activity {
             for (int i = 0; i < NEW_HEIGHT; ++i)
                 for (int j = 0; j < NEW_WIDTH; ++j) {
                     tmp[NEW_WIDTH * i + j] =
-                            originalPic.getPixel((int) (j * ((double) OLD_WIDTH / (double) NEW_WIDTH)),
-                                    (int) (i * ((double) OLD_HEIGHT / (double) NEW_HEIGHT)));
+                            originalPicBitMap[(int) (j * ((double) OLD_WIDTH / (double) NEW_WIDTH))+(int) (i * ((double) OLD_HEIGHT / (double) NEW_HEIGHT)) * OLD_WIDTH];
                 }
             compressedBitmap = tmp;
             good_quality = false;
@@ -61,7 +64,7 @@ public class MainActivity extends Activity {
                 for (int j = 0; j < OLD_WIDTH; j++) {
                     int x = (int) (j * ((double) NEW_WIDTH / (double) OLD_WIDTH));
                     int y = (int) (i * ((double) NEW_HEIGHT / (double) OLD_HEIGHT));
-                    int color = originalPic.getPixel(j, i);
+                    int color = originalPicBitMap[i * OLD_WIDTH + j];
                     tmp[y * NEW_WIDTH + x][0] += color & 0xFF;
                     tmp[y * NEW_WIDTH + x][1] += (color >> 8) & 0xFF;
                     tmp[y * NEW_WIDTH + x][2] += (color >> 16) & 0xFF;
@@ -71,8 +74,8 @@ public class MainActivity extends Activity {
             }
             for (int i = 0; i < NEW_HEIGHT; ++i) {
                 for (int j = 0; j < NEW_WIDTH; ++j) {
-                        for (int k = 0; k < 4; ++k)
-                            tmp[i * NEW_WIDTH + j][k] /= Math.max(cnt[i * NEW_WIDTH + j], 1);
+                    for (int k = 0; k < 4; ++k)
+                        tmp[i * NEW_WIDTH + j][k] /= Math.max(cnt[i * NEW_WIDTH + j], 1);
                     compressedBitmap[i * NEW_WIDTH + j] = Color.argb(tmp[i * NEW_WIDTH + j][3], tmp[i * NEW_WIDTH + j][2],
                             tmp[i * NEW_WIDTH + j][1], tmp[i * NEW_WIDTH + j][0]);
                 }
@@ -81,17 +84,19 @@ public class MainActivity extends Activity {
         }
 
         public void makeBrighter() {
-            for (int i = 0; i < NEW_HEIGHT; ++i) {
-                for (int j = 0; j < NEW_WIDTH; ++j) {
-                    int color = compressedBitmap[j + i * NEW_WIDTH];
+            int[] tmp = new int[OLD_HEIGHT * OLD_WIDTH];
+            for (int i = 0; i < OLD_HEIGHT; ++i) {
+                for (int j = 0; j < OLD_WIDTH; ++j) {
+                    int color = originalPic.getPixel(j, i);
                     int blue = Math.min(255, 2 * (color & 0xFF));
                     int green = Math.min(255, 2 * ((color >> 8) & 0xFF));
                     int red = Math.min(255, 2 * ((color >> 16) & 0xFF));
-                    int alpha = Math.min(255, 2 * ((color >> 24) & 0xFF));
-                    compressedBitmap[NEW_WIDTH * i + j] = Color.argb(alpha, red, green, blue);
+                    int alpha = Math.min(255, ((color >> 24) & 0xFF));
+                    tmp[OLD_WIDTH * i + j] = Color.argb(alpha, red, green, blue);
 
                 }
             }
+            originalPicBitMap = tmp;
         }
 
         public boolean onTouchEvent(MotionEvent event) {
@@ -104,14 +109,13 @@ public class MainActivity extends Activity {
                 fastCompression();
                 paint.setColor(Color.BLACK);
                 paint.setTextSize(20);
-                canvas.drawText("GOOD QUALITY", 20, 500, paint);
+                canvas.drawText("BAD QUALITY", 20, 500, paint);
             } else {
                 goodQualityComression();
                 paint.setColor(Color.BLACK);
                 paint.setTextSize(20);
-                canvas.drawText("BAD QUALITY", 20, 500, paint);
+                canvas.drawText("GOOD QUALITY", 20, 500, paint);
             }
-            makeBrighter();
             turn_right();
             canvas.drawBitmap(compressedBitmap, 0, NEW_HEIGHT, 0, 0, NEW_HEIGHT, NEW_WIDTH, true, paint);
 
