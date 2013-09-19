@@ -13,7 +13,6 @@ import java.util.Arrays;
     public static final int maskBlue = 0x000000FF;
     public static final int maskPositive = 0x7FFFFFFF; // overflow guard
     public static final int maxAlpha = 0xFF000000;
-    public static final int noAlphaMask = 0x00FFFFFF;
 
     int[] pixels;
     int width;

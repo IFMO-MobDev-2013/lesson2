@@ -19,10 +19,12 @@ public class EditImageView extends View {
     public static final String SOURCE_FILE_NAME = "source.png";
     public static final double BRIGHTNESS_CHANGE = 1.8;
     public static final double SQUEEZE_COEFFICIENT = 1.83;
+    public static final int ROTATE_TIMES = 1;
     private Context context;
     private Bitmap sourceBitmap;
-    private Image image;
-    private ImageUpdater imageUpdater;
+    private boolean useFast;
+
+
 
 
     public Bitmap loadImageBitmap(String sourceFileName) throws IOException {
@@ -34,48 +36,25 @@ public class EditImageView extends View {
         super(context);
         this.context = context;
         sourceBitmap = loadImageBitmap(SOURCE_FILE_NAME);
-        imageUpdater = new ImageUpdater(SQUEEZE_COEFFICIENT, BRIGHTNESS_CHANGE, 1);
+        useFast = true;
 
     }
 
-    class ImageUpdater implements Runnable {
-        private boolean useFast;
-        private final double squeezeCoefficient;
-        private final double brightnessChange;
-        private final int rotateTimes;
-
-
-        ImageUpdater(double squeezeCoefficient, double brightnessChange, int rotateTimes) {
-            this.squeezeCoefficient = squeezeCoefficient;
-            this.brightnessChange = brightnessChange;
-            this.rotateTimes = rotateTimes;
-            useFast = true;
-
-        }
-
-        @Override
-        public void run() {
-            image = new Image(sourceBitmap);
-            image.changeBrightness(brightnessChange);
-            for (int i = 0; i < rotateTimes % 4; i++) {
-                image.rotateLeft();
-            }
-            if (useFast) {
-                image.fastSqueeze(squeezeCoefficient);
-            } else {
-                image.squeeze(squeezeCoefficient);
-            }
-            useFast ^= true;
-
-
-
-        }
-    }
 
 
     @Override
     protected void onDraw(Canvas canvas) {
-        AsyncTask.execute(imageUpdater);
+        Image image = new Image(sourceBitmap);
+        image.changeBrightness(BRIGHTNESS_CHANGE);
+        for (int i = 0; i < ROTATE_TIMES % 4; i++) {
+            image.rotateLeft();
+        }
+        if (useFast) {
+            image.fastSqueeze(SQUEEZE_COEFFICIENT);
+        } else {
+            image.squeeze(SQUEEZE_COEFFICIENT);
+        }
+        useFast ^= true;
 
 
 
@@ -86,6 +65,8 @@ public class EditImageView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
+
 
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             invalidate();
