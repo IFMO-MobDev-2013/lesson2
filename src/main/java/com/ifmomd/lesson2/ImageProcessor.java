@@ -1,10 +1,6 @@
 package com.ifmomd.lesson2;
 
-import android.*;
-import android.R;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.util.Log;
 
 public class ImageProcessor {
     public static int[] roughDownscale(int[] oPixels, int oWidth, double downscale) {
@@ -71,22 +67,20 @@ public class ImageProcessor {
 
     public static int[] turnClockwise(int[] oPixels, int oWidth) {
         int rWidth = oPixels.length/oWidth;
-        int rHeight = oWidth;
-        int[] result = new int[rHeight * rWidth];
-        for (int y = 0; y < rHeight; y++)
+        int[] result = new int[oWidth * rWidth];
+        for (int y = 0; y < oWidth; y++)
             for (int x = 0; x < rWidth; x++)
                 result[y * rWidth + (rWidth - 1 - x)] = oPixels[x * oWidth + y];
         return result;
     }
 
     public static int[] increaseBrightness(int[] oPixels, int oWidth) {
-        int rWidth = oWidth;
         int rHeight = oPixels.length/oWidth;
-        int[] result = new int[rHeight * rWidth];
+        int[] result = new int[rHeight * oWidth];
         for (int y = 0; y < rHeight; y++)
-            for (int x = 0; x < rWidth; x++) {
-                int pixel = oPixels[y * rWidth + x];
-                result[y * rWidth + x] = Color.argb(Color.alpha(pixel),
+            for (int x = 0; x < oWidth; x++) {
+                int pixel = oPixels[y * oWidth + x];
+                result[y * oWidth + x] = Color.argb(Color.alpha(pixel),
                                                     Color.red(pixel) + (255 - Color.red(pixel)) / 2,
                                                     Color.green(pixel) + (255 - Color.green(pixel)) / 2,
                                                     Color.blue(pixel) + (255 - Color.blue(pixel)) / 2);

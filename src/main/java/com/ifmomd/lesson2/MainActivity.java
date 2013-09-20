@@ -9,35 +9,35 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
-    public static final double RATE = 1.73;
+    public static final double RATE = 1.37;
 
     private Bitmap getRoughImage() {
         long time = System.currentTimeMillis();
         Bitmap src = BitmapFactory.decodeResource(getResources(), R.drawable.source);
-        int[] pixels = new int[src.getWidth()*src.getHeight()];
+        int[] pixels = new int[src.getWidth() * src.getHeight()];
         src.getPixels(pixels, 0, src.getWidth(), 0, 0, src.getWidth(), src.getHeight());
-        int rWidth = (int)(src.getWidth()/RATE);
-        int rHeight = (int)(src.getHeight()/RATE);
+        int rWidth = (int) (src.getWidth() / RATE);
+        int rHeight = (int) (src.getHeight() / RATE);
         Bitmap result = Bitmap.createBitmap(
                 ImageProcessor.increaseBrightness(
-                ImageProcessor.turnClockwise(
-                ImageProcessor.roughDownscale(pixels, src.getWidth(), RATE),rWidth),rHeight), rHeight, rWidth, Bitmap.Config.ARGB_8888);
-        Toast.makeText(this, "Rough transform: "+(System.currentTimeMillis()-time)+" ms",Toast.LENGTH_SHORT).show();
+                        ImageProcessor.turnClockwise(
+                                ImageProcessor.roughDownscale(pixels, src.getWidth(), RATE), rWidth), rHeight), rHeight, rWidth, Bitmap.Config.ARGB_8888);
+        Toast.makeText(this, "Rough transform: " + (System.currentTimeMillis() - time) + " ms", Toast.LENGTH_SHORT).show();
         return result;
     }
 
     private Bitmap getFineImage() {
         long time = System.currentTimeMillis();
         Bitmap src = BitmapFactory.decodeResource(getResources(), R.drawable.source);
-        int[] pixels = new int[src.getWidth()*src.getHeight()];
+        int[] pixels = new int[src.getWidth() * src.getHeight()];
         src.getPixels(pixels, 0, src.getWidth(), 0, 0, src.getWidth(), src.getHeight());
-        int rWidth = (int)(src.getWidth()/RATE);
-        int rHeight = (int)(src.getHeight()/RATE);
+        int rWidth = (int) (src.getWidth() / RATE);
+        int rHeight = (int) (src.getHeight() / RATE);
         Bitmap result = Bitmap.createBitmap(
                 ImageProcessor.increaseBrightness(
                         ImageProcessor.turnClockwise(
-                                ImageProcessor.fineDownscale(pixels, src.getWidth(), RATE),rWidth),rHeight), rHeight, rWidth, Bitmap.Config.ARGB_8888);
-        Toast.makeText(this, "Fine transform: "+(System.currentTimeMillis()-time)+" ms",Toast.LENGTH_SHORT).show();
+                                ImageProcessor.fineDownscale(pixels, src.getWidth(), RATE), rWidth), rHeight), rHeight, rWidth, Bitmap.Config.ARGB_8888);
+        Toast.makeText(this, "Fine transform: " + (System.currentTimeMillis() - time) + " ms", Toast.LENGTH_SHORT).show();
         return result;
     }
 
@@ -49,10 +49,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ivResult = new ImageView(this);
+        setContentView(R.layout.activity_main);
+        ivResult = (ImageView)findViewById(R.id.ivResult);
         ivResult.setOnClickListener(this);
+        ivResult.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         updateImage();
-        setContentView(ivResult);
     }
 
     private void updateImage() {
