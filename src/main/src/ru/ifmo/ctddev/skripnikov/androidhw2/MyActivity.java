@@ -6,8 +6,6 @@ import android.graphics.*;
 import android.os.Bundle;
 import android.view.View;
 
-import java.util.ArrayList;
-
 public class MyActivity extends Activity {
     private static final int W = 405;
     private static final int H = 434;
@@ -58,44 +56,64 @@ public class MyActivity extends Activity {
     }
 
     private int[] veryLongScale() {
-        Pixel[][] pixel = new Pixel[H][W];
-        double k = (double) W / oldW;
-        double kk = 100 / k / k;
-        double[] d = new double[oldH+1];
+        int maxSize = 16;
+        int[][][] colors = new int[H][W][maxSize];
+        float[][][] per = new float[H][W][maxSize];
+        int[][] size = new int[H][W];
+        float k = (float) W / oldW;
+        float kk = 100 / k / k;
+        float[] d = new float[oldH + 1];
         for (int i = 0; i <= oldH; i++)
-            d[i] = i*k;
-        int[] id = new int[oldH+1];
+            d[i] = i * k;
+        int[] id = new int[oldH + 1];
         for (int i = 0; i <= oldH; i++)
-            id[i] = (int)d[i];
-        for (int h = 0; h < H; h++)
-            for (int w = 0; w < W; w++)
-                pixel[h][w] = new Pixel();
+            id[i] = (int) d[i];
         int[] o = new int[oldW * oldH];
         original.getPixels(o, 0, oldW, 0, 0, oldW, oldH);
         for (int h = 0; h < oldH; h++)
             for (int w = 0; w < oldW; w++) {
-                if (id[w+1] >= 405 || id[h+1] >= 434) {
+                if (id[w + 1] >= W || id[h + 1] >= H) {
                     continue;
                 }
-                if (id[w+1] > id[w] && id[h+1] > id[h]) {
-                    pixel[id[h]][id[w]].setColor(o[h * oldW + w], (id[w+1] - d[w]) * (id[h+1] - d[h]) * kk);
-                    pixel[id[h+1]][id[w+1]].setColor(o[h * oldW + w], (d[w+1] - id[w+1]) * (d[h+1] - id[h+1]) * kk);
-                    pixel[id[h]][id[w+1]].setColor(o[h * oldW + w], (id[w+1] - id[w+1]) * (id[h+1] - d[h]) * kk);
-                    pixel[id[h+1]][id[w]].setColor(o[h * oldW + w], (id[w+1] - d[w]) * (d[h+1] - id[h+1]) * kk);
-                } else if (id[w+1] > id[w]) {
-                    pixel[id[h]][id[w]].setColor(o[h * oldW + w], (id[w+1] - d[w]) / k * 100);
-                    pixel[id[h]][id[w+1]].setColor(o[h * oldW + w], 100 -  (id[w+1] - d[w]) / k * 100);
-                } else if (id[h+1] > id[h]) {
-                    pixel[id[h]][id[w]].setColor(o[h * oldW + w], (id[h+1] - d[h]) / k * 100);
-                    pixel[id[h+1]][id[w]].setColor(o[h * oldW + w], 100 - (id[h+1] - d[h]) / k * 100);
+                if (id[w + 1] > id[w] && id[h + 1] > id[h]) {
+                    colors[id[h]][id[w]][size[id[h]][id[w]]] = o[h * oldW + w];
+                    colors[id[h + 1]][id[w + 1]][size[id[h + 1]][id[w + 1]]] = o[h * oldW + w];
+                    colors[id[h]][id[w + 1]][size[id[h]][id[w + 1]]] = o[h * oldW + w];
+                    colors[id[h + 1]][id[w]][size[id[h + 1]][id[w]]] = o[h * oldW + w];
+                    per[id[h]][id[w]][size[id[h]][id[w]]++] = (id[w + 1] - d[w]) * (id[h + 1] - d[h]) * kk;
+                    per[id[h + 1]][id[w + 1]][size[id[h + 1]][id[w + 1]]++] = (d[w + 1] - id[w + 1]) * (d[h + 1] - id[h + 1]) * kk;
+                    per[id[h]][id[w + 1]][size[id[h]][id[w + 1]]++] = (id[w + 1] - id[w + 1]) * (id[h + 1] - d[h]) * kk;
+                    per[id[h + 1]][id[w]][size[id[h + 1]][id[w]]++] = (id[w + 1] - d[w]) * (d[h + 1] - id[h + 1]) * kk;
+                } else if (id[w + 1] > id[w]) {
+                    colors[id[h]][id[w]][size[id[h]][id[w]]] = o[h * oldW + w];
+                    colors[id[h]][id[w + 1]][size[id[h]][id[w + 1]]] = o[h * oldW + w];
+                    per[id[h]][id[w]][size[id[h]][id[w]]++] = (id[w + 1] - d[w]) / k * 100;
+                    per[id[h]][id[w + 1]][size[id[h]][id[w + 1]]++] = 100 - (id[w + 1] - d[w]) / k * 100;
+                } else if (id[h + 1] > id[h]) {
+                    colors[id[h]][id[w]][size[id[h]][id[w]]] = o[h * oldW + w];
+                    colors[id[h + 1]][id[w]][size[id[h + 1]][id[w]]] = o[h * oldW + w];
+                    per[id[h]][id[w]][size[id[h]][id[w]]++] = (id[h + 1] - d[h]) / k * 100;
+                    per[id[h + 1]][id[w]][size[id[h + 1]][id[w]]++] = 100 - (id[h + 1] - d[h]) / k * 100;
                 } else {
-                    pixel[id[h]][id[w]].setColor(o[h * oldW + w], 100);
+                    colors[id[h]][id[w]][size[id[h]][id[w]]] = o[h * oldW + w];
+                    per[id[h]][id[w]][size[id[h]][id[w]]++] = (float) 100;
                 }
             }
         int[] pix = new int[H * W];
         for (int h = 0; h < H; h++)
-            for (int w = 0; w < W; w++)
-                pix[h * W + w] = pixel[h][w].getColor();
+            for (int w = 0; w < W; w++) {
+                int s = 0, a = 0, r = 0, g = 0, b = 0;
+                for (int i = 0; i < size[h][w]; i++)
+                    s += per[h][w][i];
+                for (int i = 0; i < size[h][w]; i++) {
+                    float m = per[h][w][i] / s;
+                    a += Color.alpha(colors[h][w][i]) * m;
+                    r += Color.red(colors[h][w][i]) * m;
+                    g += Color.green(colors[h][w][i]) * m;
+                    b += Color.blue(colors[h][w][i]) * m;
+                }
+                pix[h * W + w] = Color.argb(a, r, g, b);
+            }
         return pix;
     }
 
@@ -119,43 +137,6 @@ public class MyActivity extends Activity {
                 b = (b + 255) / 2;
                 pixels[h * W + w] = Color.argb(a, r, g, b);
             }
-    }
-
-    private class Pixel {
-        private ArrayList<Integer> colors = new ArrayList<Integer>();
-        private ArrayList<Double> per = new ArrayList<Double>();
-
-        public void setColor(int c, double p) {
-            colors.add(c);
-            per.add(p);
-        }
-
-        public int getColor() {
-            int s = 0;
-            int a = 0;
-            int r = 0;
-            int g = 0;
-            int b = 0;
-            for (int i = 0; i < per.size(); i++)
-                s += per.get(i);
-            for (int i = 0; i < per.size(); i++)
-                per.set(i, per.get(i) / s);
-            for (int i = 0; i < colors.size(); i++) {
-                int da = Color.alpha(colors.get(i));
-                int dr = Color.red(colors.get(i));
-                int dg = Color.green(colors.get(i));
-                int db = Color.blue(colors.get(i));
-                da *= per.get(i);
-                dr *= per.get(i);
-                dg *= per.get(i);
-                db *= per.get(i);
-                a += da;
-                r += dr;
-                g += dg;
-                b += db;
-            }
-            return Color.argb(a, r, g, b);
-        }
     }
 
     @Override
