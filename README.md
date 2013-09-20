@@ -1,3 +1,10 @@
+GImageResizer
+==================
+Автор: Георгий Агапов (группа 2537)
+
+APK: http://yadi.sk/d/kQjHe4bF9TPQY
+
+
 Материалы второй лекции:
 =======
 http://yadi.sk/d/AERRqQ-v9Gx77
