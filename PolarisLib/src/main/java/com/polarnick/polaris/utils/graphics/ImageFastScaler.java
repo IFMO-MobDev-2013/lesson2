@@ -29,12 +29,12 @@ public class ImageFastScaler extends ImageProcessingBase {
 
     @Override
     protected ImageProcessor getProcessor(byte[] source, int sourceWidth, int sourceHeight, byte[] target, int targetWidth, int targetHeight, int fromY, int toY) {
-        return new RotatingProcessor(source, sourceWidth, sourceHeight, target, targetWidth, targetHeight, fromY, toY);
+        return new ScalingProcessor(source, sourceWidth, sourceHeight, target, targetWidth, targetHeight, fromY, toY);
     }
 
-    protected class RotatingProcessor extends ImageProcessor {
+    protected class ScalingProcessor extends ImageProcessor {
 
-        public RotatingProcessor(byte[] source, int sourceWidth, int sourceHeight, byte[] target, int targetWidth, int targetHeight, int fromY, int toY) {
+        public ScalingProcessor(byte[] source, int sourceWidth, int sourceHeight, byte[] target, int targetWidth, int targetHeight, int fromY, int toY) {
             super(source, sourceWidth, sourceHeight, target, targetWidth, targetHeight, fromY, toY);
         }
 
