@@ -16,8 +16,8 @@ public class MainActivity extends Activity {
     private final int FINAL_WIDTH = 405;
     private final int FINAL_HEIGHT = 434;
 
-    private final int SOURCE_WIDTH = 700;
-    private final int SOURCE_HEIGHT = 750;
+    private int SOURCE_WIDTH;
+    private int SOURCE_HEIGHT;
 
     private final double eps = 1e-9;
 
@@ -40,7 +40,7 @@ public class MainActivity extends Activity {
                     green = (color & 0xFF00) / 0x100;
                     red = (color & 0xFF0000) / 0x10000;
                     pixels[j * FINAL_HEIGHT + (FINAL_HEIGHT - 1) - i] =
-                            (color & 0xFF000000) + 0x10000 * Math.min(255, red * 2) + 0x100 * Math.min(255, 2 *green) + Math.min(255, 2 * blue);
+                                     (color & 0xFF000000) + 0x10000 * Math.min(255, red * 2) + 0x100 * Math.min(255, 2 *green) + Math.min(255, 2 * blue);
                 }
             }
             imageView.setImageBitmap(Bitmap.createBitmap(pixels, FINAL_HEIGHT, FINAL_WIDTH, Bitmap.Config.ARGB_8888));
@@ -113,8 +113,10 @@ public class MainActivity extends Activity {
         imageView = (ImageView) findViewById(R.id.imageView);
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.source);
         source_pixels = new int[bitmap.getWidth() * bitmap.getHeight()];
+        SOURCE_WIDTH = bitmap.getWidth();
+        SOURCE_HEIGHT = bitmap.getHeight();
         bitmap.getPixels(source_pixels, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-        imageView.setImageBitmap(bitmap);
+        imageView.setImageBitmap(Bitmap.createBitmap(source_pixels, bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888));
         textView = (TextView) findViewById(R.id.textView);
         textView.setText("No transformation.");
     }
