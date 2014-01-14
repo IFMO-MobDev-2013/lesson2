@@ -111,13 +111,13 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         imageView = (ImageView) findViewById(R.id.imageView);
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.source);
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.article);
         source_pixels = new int[bitmap.getWidth() * bitmap.getHeight()];
         SOURCE_WIDTH = bitmap.getWidth();
         SOURCE_HEIGHT = bitmap.getHeight();
         bitmap.getPixels(source_pixels, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
         imageView.setImageBitmap(Bitmap.createBitmap(source_pixels, bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888));
         textView = (TextView) findViewById(R.id.textView);
-        textView.setText("No transformation.");
+        textView.setText("No transformation, width = " + bitmap.getWidth() + ", height = " + bitmap.getHeight());
     }
 }
