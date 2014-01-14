@@ -111,7 +111,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         imageView = (ImageView) findViewById(R.id.imageView);
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.article);
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.source);
         source_pixels = new int[bitmap.getWidth() * bitmap.getHeight()];
         SOURCE_WIDTH = bitmap.getWidth();
         SOURCE_HEIGHT = bitmap.getHeight();
