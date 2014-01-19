@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PictureSample</string>
+    <string name="origin">Оригинал</string>
+    <string name="fast">Быстрое</string>
+    <string name="fine">Хорошее</string>
+</resources>
