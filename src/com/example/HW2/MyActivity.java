@@ -33,8 +33,7 @@ public class MyActivity extends Activity {
         private int oldImage[];
         private final Paint paint;
         private final Paint paint2;
-        private double ratio[][][];
-        private int tableImage [][];
+        private int tableImage[][];
 
         public MyView(Context context) {
             super(context);
@@ -70,41 +69,15 @@ public class MyActivity extends Activity {
                 }
             });
 
-            initRatio();
-            tableImage = new int [WIDTH][HEIGHT];
+            tableImage = new int[WIDTH][HEIGHT];
             int k = 0;
 
-            for(int i = 0; i < HEIGHT; i++)
-                for(int j = 0; j < WIDTH; j++) {
+            for (int i = 0; i < HEIGHT; i++)
+                for (int j = 0; j < WIDTH; j++) {
                     tableImage[j][i] = oldImage[k];
                     k++;
                 }
 
-        }
-
-        public void initRatio() {
-            ratio = new double[NEW_WIDTH + 1][NEW_HEIGHT + 1][16];
-            for(int i = 0; i < NEW_WIDTH; i++)
-                for(int j = 0; j < NEW_HEIGHT; j++){
-                    double x = i * FACTOR - (int) (i * FACTOR);
-                    double y = j * FACTOR - (int) (j * FACTOR);
-                        ratio[i][j][0] = (x - 1) * (x - 2) * (x + 1) * (y - 1) * (y - 2) * (y + 1) / 4;
-                        ratio[i][j][1] = -x * (x + 1) * (x - 2) * (y - 1) * (y - 2) * (y + 1) / 4;
-                        ratio[i][j][2] = -y * (x - 1) * (x - 2) * (x + 1) * (y + 1) * (y - 2) / 4;
-                        ratio[i][j][3] =  x * y * (x + 1) * (x - 2) * (y + 1) * (y - 2) / 4;
-                        ratio[i][j][4] = -x * (x - 1) * (x - 2) * (y - 1) * (y - 2) * (y + 1) / 12;
-                        ratio[i][j][5] = -y * (x - 1) * (x - 2) * (x + 1) * (y - 1) * (y - 2) / 12;
-                        ratio[i][j][6] =  x * y * (x - 1) * (x - 2) * (y + 1) * (y - 2) / 12;
-                        ratio[i][j][7] =  x * y * (x + 1) * (x - 2) * (y - 1) * (y - 2) / 12;
-                        ratio[i][j][8] =  x * (x - 1) * (x + 1) * (y - 1) * (y - 2) * (y + 1) / 12;
-                        ratio[i][j][9] =  y * (x - 1) * (x - 2) * (x + 1) * (y - 1) * (y + 1) / 12;
-                        ratio[i][j][10] =  x * y * (x - 1) * (x - 2) * (y - 1) * (y - 2) / 36;
-                        ratio[i][j][11] = -x * y * (x - 1) * (x + 1) * (y + 1) * (y - 2) / 12;
-                        ratio[i][j][12] = -x * y * (x + 1) * (x - 2) * (y - 1) * (y + 1) / 12;
-                        ratio[i][j][13] = -x * y * (x - 1) * (x + 1) * (y - 1) * (y - 2) / 36;
-                        ratio[i][j][14] = -x * y * (x - 1) * (x - 2) * (y - 1) * (y + 1) / 36;
-                        ratio[i][j][15] =  x * y * (x - 1) * (x + 1) * (y - 1) * (y + 1) / 36;
-                }
         }
 
         public int setBright(int color) {
@@ -112,10 +85,11 @@ public class MyActivity extends Activity {
             int red;
             int green;
             int blue;
-            alpha = Color.alpha(color) + 100;
-            red = Color.red(color) + 100;
-            green = Color.green(color) + 100;
-            blue = Color.blue(color) + 100;
+            final int CONST = 25;
+            alpha = Color.alpha(color) + CONST;
+            red = Color.red(color) + CONST;
+            green = Color.green(color) + CONST;
+            blue = Color.blue(color) + CONST;
 
             if (alpha > 255) alpha = 255;
             if (red > 255) red = 255;
@@ -135,7 +109,7 @@ public class MyActivity extends Activity {
                     index++;
                 }
             }
-            Bitmap newBitmap = Bitmap.createBitmap(NEW_HEIGHT, NEW_WIDTH, Bitmap.Config.RGB_565);
+            Bitmap newBitmap = Bitmap.createBitmap(NEW_HEIGHT, NEW_WIDTH, Bitmap.Config.ARGB_8888);
             newBitmap.setPixels(fastImage, 0, NEW_HEIGHT, 0, 0, NEW_HEIGHT, NEW_WIDTH);
             time = SystemClock.currentThreadTimeMillis() - time;
             return newBitmap;
@@ -145,62 +119,49 @@ public class MyActivity extends Activity {
             time = SystemClock.currentThreadTimeMillis();
             int[] goodImage = new int[NEW_HEIGHT * NEW_WIDTH];
             int[][] table = new int[NEW_WIDTH + 1][NEW_HEIGHT + 1];
+            int alpha, red, green, blue;
+            int t;
+            int x, y;
 
-            for(int i = 0; i < NEW_WIDTH; i++) {
-                for(int j =0 ;j < NEW_HEIGHT; j++){
-                    int x = (int) (i * FACTOR);
-                    int y = (int) (j * FACTOR);
-                    double alpha = 0;
-                    double red = 0;
-                    double green = 0;
-                    double blue = 0;
-                    int a = 0;
-                    int b = 0;
-
-                    for (int k = 0; k < 16; k++) {
-
-                        if (k == 0 || k == 1 || k == 4 || k == 8) a = 0;
-                        if (k == 2 || k == 3 || k == 6 || k == 11) a = 1;
-                        if (k == 5 || k == 7 || k == 10 || k == 13) a = -1;
-                        if (k == 9 || k == 12 || k == 14 || k == 15) a = 2;
-
-                        if (k == 0 || k == 2 || k == 5 || k == 9) b = 0;
-                        if (k == 1 || k == 3 || k == 7 || k == 12) b = 1;
-                        if (k == 4 || k == 6 || k == 10 || k == 14) b = -1;
-                        if (k == 8 || k == 11 || k == 13 || k == 15) b = 2;
-
-                        if (x + a >= 0 && x + a < WIDTH && y + b >= 0 && y + b < HEIGHT) {
-                            red += ratio[i][j][k] * Color.red(tableImage[x + a][y + b]);
-                            green += ratio[i][j][k] * Color.green(tableImage[x + a][y + b]);
-                            blue += ratio[i][j][k] * Color.blue(tableImage[x + a][y + b]);
-                            alpha += ratio[i][j][k] * Color.alpha(tableImage[x + a][y + b]);
+            for (int i = 0; i < NEW_WIDTH; i++)
+                for (int j = 0; j < NEW_HEIGHT; j++) {
+                    alpha = 0;
+                    red = 0;
+                    green = 0;
+                    blue = 0;
+                    t = 0;
+                    for (x = Math.max(0, (int) (i * FACTOR) - 2); x < Math.min(WIDTH, (int) (i * FACTOR) + 2); x++)
+                        for (y = Math.max(0, (int) (j * FACTOR) - 2); y < Math.min(HEIGHT, (int) (j * FACTOR) + 2); y++) {
+                            alpha += Color.alpha(tableImage[x][y]);
+                            red += Color.red(tableImage[x][y]);
+                            green += Color.green(tableImage[x][y]);
+                            blue += Color.blue(tableImage[x][y]);
+                            t++;
                         }
-                    }
-
-                    table[i][j] = setBright(Color.argb((int) alpha, (int) red, (int) green, (int)blue));
+                    table[i][j] = Color.argb(Math.min(alpha / t + 25, 255), Math.min(red / t + 25, 255),
+                            Math.min(green / t + 25, 255), Math.min(blue / t + 25, 255));
                 }
-            }
+
             int k = 0;
-            for(int i = 0; i < NEW_WIDTH; i++){
-                for(int j = NEW_HEIGHT; j > 0; j--){
+            for (int i = 0; i < NEW_WIDTH; i++) {
+                for (int j = NEW_HEIGHT; j > 0; j--) {
                     goodImage[k] = table[i][j];
                     k++;
                 }
             }
 
-            Bitmap newBitmap = Bitmap.createBitmap(NEW_HEIGHT, NEW_WIDTH, Bitmap.Config.RGB_565);
+            Bitmap newBitmap = Bitmap.createBitmap(NEW_HEIGHT, NEW_WIDTH, Bitmap.Config.ARGB_8888);
             newBitmap.setPixels(goodImage, 0, NEW_HEIGHT, 0, 0, NEW_HEIGHT, NEW_WIDTH);
             time = SystemClock.currentThreadTimeMillis() - time;
             return newBitmap;
         }
-
 
         @Override
         public void onDraw(Canvas canvas) {
             if (optimization) {
                 canvas.drawBitmap(createFastImage(), 0, 0, null);
                 canvas.drawText("Fast compression", 10, D_HEIGHT - 80, paint2);
-            }else {
+            } else {
                 canvas.drawBitmap(createGoodImage(), 0, 0, null);
                 canvas.drawText("High-quality compression", 10, D_HEIGHT - 80, paint2);
             }
